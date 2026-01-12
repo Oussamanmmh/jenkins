@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id("org.sonarqube") version "7.1.0.6387"
+    id 'maven-publish'
+
+}
+
+group = 'com.example'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'io.cucumber:cucumber-java:6.0.0'
+    testImplementation 'io.cucumber:cucumber-junit:6.0.0'
+}
+
+
+test {
+    useJUnit()
+    //finalizedBy "generateCucumberReports", "jacocoTestReport","sonar"
+    finalizedBy  "sonar"
+}
+
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = file("$buildDir/reports/jacoco")
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "PROJECT_Build"
+        property "sonar.projectName", "PROJECT Build"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.login", "admin"
+        property "sonar.password", "admin"
+
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                "build/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B/"
+            credentials {
+                username = project.findProperty("MAVEN_USER")
+                password = project.findProperty("MAVEN_PASSWORD")
+            }
+            isAllowInsecureProtocol = true
+        }
+    }
+}
