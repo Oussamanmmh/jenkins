@@ -18,19 +18,16 @@ dependencies {
     testImplementation 'io.cucumber:cucumber-junit:6.0.0'
 }
 
-// -------------------- TEST --------------------
 test {
     useJUnit()
 }
 
-// Optional Cucumber task
 tasks.register('cucumber') {
     group = "verification"
     description = "Runs Cucumber tests"
     dependsOn test
 }
 
-// -------------------- JACOCO --------------------
 jacocoTestReport {
     dependsOn test
     reports {
@@ -51,7 +48,6 @@ sonarqube {
     }
 }
 
-// -------------------- MAVEN PUBLISH --------------------
 publishing {
     publications {
         mavenJava(MavenPublication) {

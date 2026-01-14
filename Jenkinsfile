@@ -15,7 +15,7 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh './gradlew sonarqube'
+                    sh './gradlew sonarqube --info --stacktrace'
                 }
             }
         }
