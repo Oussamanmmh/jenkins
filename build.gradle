@@ -1,31 +1,37 @@
 plugins {
     id 'java'
-    id 'jacoco'
-    id "org.sonarqube" version "7.1.0.6387"
+    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.25"
+    id "jacoco"
+    id 'org.sonarqube' version "4.4.1.3373"
     id 'maven-publish'
 }
 
 group = 'com.example'
-version = '1.0'
+version = '1.0 -Jenkins'
 
 repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 dependencies {
+    testImplementation 'io.cucumber:cucumber-java:7.14.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.14.0'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'io.cucumber:cucumber-java:6.0.0'
-    testImplementation 'io.cucumber:cucumber-junit:6.0.0'
 }
 
-test {
-    useJUnit()
+cucumberReports {
+    outputDir = file('build/reports/cucumber/html')
+    buildId = '0'
+    reports = files('build/reports/cucumber/cucumber.json')
 }
 
-tasks.register('cucumber') {
-    group = "verification"
-    description = "Runs Cucumber tests"
-    dependsOn test
+jacoco {
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {
@@ -33,19 +39,21 @@ jacocoTestReport {
     reports {
         xml.required = true
         csv.required = false
-        html.outputLocation = file("$buildDir/reports/jacoco")
+        html.required = true
+        html.destination = file("${buildDir}/reports/jacoco")
     }
 }
 
-// -------------------- SONAR --------------------
 sonar {
     properties {
-        property "sonar.projectKey", "PROJECT_Build"
-        property "sonar.projectName", "PROJECT Build"
-        property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.token","26fddaab7d4f2563c676bfa6057df197526f1091"
-        property "sonar.coverage.jacoco.xmlReportPaths",
-                "build/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.projectKey", "tp"
+        property "sonar.projectName", "Jenkins Pipeline"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.token", project.findProperty("SONAR_TOKEN") ?: ""
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.binaries", "build/classes"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 
@@ -53,16 +61,41 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            groupId = 'com.example'
+            artifactId = 'my-library'
+            version = '1.0.0'
         }
     }
-
     repositories {
         maven {
-            url "https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B/"
+            name = "myrepo"
+            url = uri("https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B/")
             credentials {
                 username = project.findProperty("MAVEN_USER")
-                password = project.findProperty("MAVEN_PASSWORD")
+                password =  project.findProperty("MAVEN_PASSWORD")
             }
         }
     }
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = file("$buildDir/docs/javadoc")
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+}
+
+test {
+    useJUnit()
+
+    systemProperty "cucumber.plugin", "json:build/reports/cucumber/cucumber.json"
+
+    finalizedBy jacocoTestReport
+
+    ignoreFailures = false
+}
+
+tasks.named('sonar') {
+    dependsOn test, jacocoTestReport
 }
