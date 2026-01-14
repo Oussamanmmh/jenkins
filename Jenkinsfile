@@ -31,7 +31,7 @@ pipeline {
                    cucumber(
                        buildStatus: 'UNSTABLE',
                        reportTitle: 'My report',
-                       fileIncludePattern: '**/cucumber.json',
+                       fileIncludePattern: 'build/reports/cucumber/*.json',
                        trendsLimit: 10
                    )
                }
