@@ -90,10 +90,9 @@ pipeline {
            echo "Pipeline terminé avec succès"
 
            script {
-               // EMAIL
                try {
                    emailext(
-                       to: "oussamanmamcha@gmail.com",
+                       to: "mo_nemamcha@esi.dz",
                        subject: "Pipeline SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                        body: """
                            <h2>Pipeline exécuté avec succès</h2>
@@ -127,7 +126,7 @@ pipeline {
                // EMAIL
                try {
                    emailext(
-                       to: "oussamanmamcha@gmail.com",
+                       to: "mo_nemamcha@esi.dz",
                        subject: "Pipeline FAILURE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                        body: """
                            <h2>Pipeline échoué</h2>
