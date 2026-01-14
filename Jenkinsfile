@@ -84,126 +84,128 @@ pipeline {
         }
     }
 
-    post {
+   post {
 
-        always {
-            echo "Fin du pipeline – nettoyage si nécessaire"
-        }
+       always {
+           echo "Fin du pipeline – nettoyage si nécessaire"
+       }
 
-        success {
-            echo "Pipeline terminé avec succès"
+       success {
+           echo "Pipeline terminé avec succès"
 
-            script {
-                // EMAIL
-                try {
-                    emailext(
-                        to: "mo_nemamcha@gmail.com",
-                        subject: "Pipeline SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <h2>Pipeline exécuté avec succès</h2>
-                            <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
-                            <p><strong>Status :</strong> SUCCESS</p>
-                            <p><a href="${env.BUILD_URL}">Voir le build</a></p>
-                        """,
-                        mimeType: 'text/html'
-                    )
-                } catch (e) {
-                    echo "Erreur email : ${e.message}"
-                }
+           script {
+               try {
+                   emailext(
+                       to: "oussamanmamcha@gmail.com",
+                       subject: "Pipeline SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                       body: """
+                           <h2>Pipeline exécuté avec succès</h2>
+                           <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
+                           <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
+                           <p><strong>Status :</strong> SUCCESS</p>
+                           <p><a href="${env.BUILD_URL}">Voir le build</a></p>
+                       """,
+                       mimeType: 'text/html'
+                   )
+               } catch (e) {
+                   echo "Erreur email : ${e.message}"
+               }
+
+               // --- SLACK via curl ---
+               try {
+                   def slackWebhook = credentials('SLACK_WEBHOOK')
+                   sh """
+                       curl -X POST -H 'Content-type: application/json' \\
+                       --data '{
+                           "text": "*Pipeline réussi*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*URL:* ${env.BUILD_URL}",
+                           "username": "Jenkins",
+                           "icon_emoji": ":white_check_mark:"
+                       }' ${slackWebhook}
+                   """
+               } catch (e) {
+                   echo "Erreur Slack : ${e.message}"
+               }
+           }
+       }
+
+       failure {
+           echo "Pipeline échoué"
+
+           script {
+               // --- EMAIL ---
+               try {
+                   emailext(
+                       to: "oussamanmamcha@gmail.com",
+                       subject: "Pipeline FAILURE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                       body: """
+                           <h2>Pipeline échoué</h2>
+                           <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
+                           <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
+                           <p><strong>Status :</strong> FAILURE</p>
+                           <p><a href="${env.BUILD_URL}console">Voir les logs</a></p>
+                       """,
+                       mimeType: 'text/html'
+                   )
+               } catch (e) {
+                   echo "Erreur email : ${e.message}"
+               }
+
+               // --- SLACK via curl ---
+               try {
+                   def slackWebhook = credentials('SLACK_WEBHOOK')
+                   sh """
+                       curl -X POST -H 'Content-type: application/json' \\
+                       --data '{
+                           "text": "*Pipeline échoué*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*Logs:* ${env.BUILD_URL}console",
+                           "username": "Jenkins",
+                           "icon_emoji": ":x:"
+                       }' ${slackWebhook}
+                   """
+               } catch (e) {
+                   echo "Erreur Slack : ${e.message}"
+               }
+           }
+       }
+
+       unstable {
+           echo "Pipeline instable"
+
+           script {
+               // --- EMAIL ---
+               try {
+                   emailext(
+                       to: "oussamanemamcha@gmail.com",
+                       subject: "Pipeline UNSTABLE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                       body: """
+                           <h2>Pipeline instable</h2>
+                           <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
+                           <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
+                           <p><strong>Status :</strong> UNSTABLE</p>
+                           <p><a href="${env.BUILD_URL}">Voir le build</a></p>
+                       """,
+                       mimeType: 'text/html'
+                   )
+               } catch (e) {
+                   echo "Erreur email : ${e.message}"
+               }
+
+               // --- SLACK via curl ---
+               try {
+                   def slackWebhook = credentials('SLACK_WEBHOOK')
+                   sh """
+                       curl -X POST -H 'Content-type: application/json' \\
+                       --data '{
+                           "text": "*Pipeline instable*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*URL:* ${env.BUILD_URL}",
+                           "username": "Jenkins",
+                           "icon_emoji": ":warning:"
+                       }' ${slackWebhook}
+                   """
+               } catch (e) {
+                   echo "Erreur Slack : ${e.message}"
+               }
+           }
+       }
+   }
 
 
-                try {
-                    slackSend(
-                        channel: '#ogl',
-                        color: 'good',
-                        message: """
-                         *Pipeline réussi*
-                        *Projet:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *URL:* ${env.BUILD_URL}
-                        """.stripIndent()
-                    )
-                } catch (e) {
-                    echo "Erreur Slack : ${e.message}"
-                }
-            }
-        }
-
-        failure {
-            echo "Pipeline échoué"
-
-            script {
-                try {
-                    emailext(
-                        to: "oussamanmamcha@gmail.com",
-                        subject: "Pipeline FAILURE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <h2>Pipeline échoué</h2>
-                            <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
-                            <p><strong>Status :</strong> FAILURE</p>
-                            <p><a href="${env.BUILD_URL}console">Voir les logs</a></p>
-                        """,
-                        mimeType: 'text/html'
-                    )
-                } catch (e) {
-                    echo "Erreur email : ${e.message}"
-                }
-
-                try {
-                    slackSend(
-                        channel: '#ogl',
-                        color: 'danger',
-                        message: """
-                         *Pipeline échoué*
-                        *Projet:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *Logs:* ${env.BUILD_URL}console
-                        """.stripIndent()
-                    )
-                } catch (e) {
-                    echo "Erreur Slack : ${e.message}"
-                }
-            }
-        }
-
-        unstable {
-            echo "Pipeline instable"
-
-            script {
-                try {
-                    emailext(
-                        to: "lh_boulacheb@esi.dz",
-                        subject: "Pipeline UNSTABLE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <h2>Pipeline instable</h2>
-                            <p><strong>Projet :</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build :</strong> #${env.BUILD_NUMBER}</p>
-                            <p><strong>Status :</strong> UNSTABLE</p>
-                            <p><a href="${env.BUILD_URL}">Voir le build</a></p>
-                        """,
-                        mimeType: 'text/html'
-                    )
-                } catch (e) {
-                    echo "Erreur email : ${e.message}"
-                }
-
-                try {
-                    slackSend(
-                        channel: '#ogl',
-                        color: 'warning',
-                        message: """
-                        *Pipeline instable*
-                        *Projet:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *URL:* ${env.BUILD_URL}
-                        """.stripIndent()
-                    )
-                } catch (e) {
-                    echo "Slack Erreur : ${e.message}"
-                }
-            }
-        }
-    }
 }
