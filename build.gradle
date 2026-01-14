@@ -65,7 +65,6 @@ publishing {
                 username = project.findProperty("MAVEN_USER")
                 password = project.findProperty("MAVEN_PASSWORD")
             }
-            isAllowInsecureProtocol = true
         }
     }
 }
