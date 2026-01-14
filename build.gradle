@@ -23,7 +23,7 @@ dependencies {
 test {
     useJUnit()
     //finalizedBy "generateCucumberReports", "jacocoTestReport","sonar"
-    finalizedBy  "sonar"
+    //finalizedBy  "sonar"
 }
 
 
