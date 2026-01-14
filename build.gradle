@@ -71,8 +71,8 @@ publishing {
             name = "myrepo"
             url = uri("https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B/")
             credentials {
-                username = project.findProperty("MAVEN_USER")
-                password =  project.findProperty("MAVEN_PASSWORD")
+                username = "myMavenRepo"
+                password =  "test0005"
             }
         }
     }
