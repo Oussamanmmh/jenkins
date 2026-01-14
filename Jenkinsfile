@@ -97,7 +97,7 @@ pipeline {
                 // EMAIL
                 try {
                     emailext(
-                        to: "lh_boulacheb@esi.dz",
+                        to: "mo_nemamcha@gmail.com",
                         subject: "Pipeline SUCCESS : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             <h2>Pipeline exécuté avec succès</h2>
@@ -136,7 +136,7 @@ pipeline {
             script {
                 try {
                     emailext(
-                        to: "lh_boulacheb@esi.dz",
+                        to: "oussamanmamcha@gmail.com",
                         subject: "Pipeline FAILURE : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             <h2>Pipeline échoué</h2>
@@ -201,7 +201,7 @@ pipeline {
                         """.stripIndent()
                     )
                 } catch (e) {
-                    echo "Erreur Slack : ${e.message}"
+                    echo "Slack Erreur : ${e.message}"
                 }
             }
         }
