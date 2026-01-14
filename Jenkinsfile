@@ -86,14 +86,11 @@ pipeline {
 
    post {
 
-       always {
-           echo "Fin du pipeline – nettoyage si nécessaire"
-       }
-
        success {
            echo "Pipeline terminé avec succès"
 
            script {
+               // EMAIL
                try {
                    emailext(
                        to: "oussamanmamcha@gmail.com",
@@ -107,23 +104,18 @@ pipeline {
                        """,
                        mimeType: 'text/html'
                    )
-               } catch (e) {
-                   echo "Erreur email : ${e.message}"
-               }
+               } catch (e) { echo "Erreur email : ${e.message}" }
 
-               // --- SLACK via curl ---
-               try {
-                   def slackWebhook = credentials('SLACK_WEBHOOK')
+               // SLACK via curl
+               withCredentials([string(credentialsId: 'SLACK_WEBHOOK', variable: 'SLACK_WEBHOOK_URL')]) {
                    sh """
                        curl -X POST -H 'Content-type: application/json' \\
                        --data '{
                            "text": "*Pipeline réussi*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*URL:* ${env.BUILD_URL}",
                            "username": "Jenkins",
                            "icon_emoji": ":white_check_mark:"
-                       }' ${slackWebhook}
+                       }' "$SLACK_WEBHOOK_URL"
                    """
-               } catch (e) {
-                   echo "Erreur Slack : ${e.message}"
                }
            }
        }
@@ -132,7 +124,7 @@ pipeline {
            echo "Pipeline échoué"
 
            script {
-               // --- EMAIL ---
+               // EMAIL
                try {
                    emailext(
                        to: "oussamanmamcha@gmail.com",
@@ -146,23 +138,18 @@ pipeline {
                        """,
                        mimeType: 'text/html'
                    )
-               } catch (e) {
-                   echo "Erreur email : ${e.message}"
-               }
+               } catch (e) { echo "Erreur email : ${e.message}" }
 
-               // --- SLACK via curl ---
-               try {
-                   def slackWebhook = credentials('SLACK_WEBHOOK')
+               // SLACK via curl
+               withCredentials([string(credentialsId: 'SLACK_WEBHOOK', variable: 'SLACK_WEBHOOK_URL')]) {
                    sh """
                        curl -X POST -H 'Content-type: application/json' \\
                        --data '{
                            "text": "*Pipeline échoué*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*Logs:* ${env.BUILD_URL}console",
                            "username": "Jenkins",
                            "icon_emoji": ":x:"
-                       }' ${slackWebhook}
+                       }' "$SLACK_WEBHOOK_URL"
                    """
-               } catch (e) {
-                   echo "Erreur Slack : ${e.message}"
                }
            }
        }
@@ -171,7 +158,7 @@ pipeline {
            echo "Pipeline instable"
 
            script {
-               // --- EMAIL ---
+               // EMAIL
                try {
                    emailext(
                        to: "oussamanemamcha@gmail.com",
@@ -185,27 +172,23 @@ pipeline {
                        """,
                        mimeType: 'text/html'
                    )
-               } catch (e) {
-                   echo "Erreur email : ${e.message}"
-               }
+               } catch (e) { echo "Erreur email : ${e.message}" }
 
-               // --- SLACK via curl ---
-               try {
-                   def slackWebhook = credentials('SLACK_WEBHOOK')
+               // SLACK via curl
+               withCredentials([string(credentialsId: 'SLACK_WEBHOOK', variable: 'SLACK_WEBHOOK_URL')]) {
                    sh """
                        curl -X POST -H 'Content-type: application/json' \\
                        --data '{
                            "text": "*Pipeline instable*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*URL:* ${env.BUILD_URL}",
                            "username": "Jenkins",
                            "icon_emoji": ":warning:"
-                       }' ${slackWebhook}
+                       }' "$SLACK_WEBHOOK_URL"
                    """
-               } catch (e) {
-                   echo "Erreur Slack : ${e.message}"
                }
            }
        }
    }
+
 
 
 }
