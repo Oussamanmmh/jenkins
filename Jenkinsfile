@@ -5,16 +5,17 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'gradle test'
+                sh 'chmod +x gradlew'
+                sh './gradlew test'
                 junit 'build/test-results/test/*.xml'
-                sh 'gradle cucumber'
+                sh './gradlew cucumber'
             }
         }
 
         stage('Code Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'gradle sonarqube'
+                    sh './gradlew sonarqube'
                 }
             }
         }
@@ -29,18 +30,16 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'gradle build'
-                sh 'gradle javadoc'
+                sh './gradlew build'
+                sh './gradlew javadoc'
                 archiveArtifacts artifacts: 'build/libs/*.jar'
                 archiveArtifacts artifacts: 'build/docs/javadoc/**'
             }
         }
 
         stage('Deploy') {
-
             steps {
-
-                sh 'gradle publish'
+                sh './gradlew publish'
             }
         }
     }
@@ -48,7 +47,7 @@ pipeline {
     post {
         success {
             mail to: "oussamanmamcha@gmail.com",
-                 subject: "project deployed",
+                 subject: "Project deployed",
                  body: "Deployment success !!"
         }
         failure {
