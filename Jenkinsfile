@@ -43,6 +43,12 @@ pipeline {
             }
         }
 
+    stage('Generate HTML report') {
+        cucumber buildStatus: 'UNSTABLE',
+                reportTitle: 'My report',
+                fileIncludePattern: 'reports/*.json',
+                trendsLimit: 10
+    }
         stage('Code Analysis') {
             steps {
                 echo "Analyse du code avec SonarQube"
