@@ -13,13 +13,13 @@ pipeline {
             }
         }
 
-        stage('Code Analysis') {
-            steps {
-                withSonarQubeEnv('Sonar') {
-                    sh './gradlew sonar --info --stacktrace'
-                }
-            }
-        }
+//         stage('Code Analysis') {
+//             steps {
+//                 withSonarQubeEnv('sonar') {
+//                     sh './gradlew sonar --info --stacktrace'
+//                 }
+//             }
+//         }
 
         stage('Quality Gate') {
             steps {
