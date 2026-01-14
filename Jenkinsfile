@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     stages {
@@ -14,8 +15,8 @@ pipeline {
 
         stage('Code Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh './gradlew sonarqube --info --stacktrace'
+                withSonarQubeEnv('Sonar') {
+                    sh './gradlew sonar --info --stacktrace'
                 }
             }
         }

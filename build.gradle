@@ -38,11 +38,12 @@ jacocoTestReport {
 }
 
 // -------------------- SONAR --------------------
-sonarqube {
+sonar {
     properties {
         property "sonar.projectKey", "PROJECT_Build"
         property "sonar.projectName", "PROJECT Build"
         property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.token","26fddaab7d4f2563c676bfa6057df197526f1091"
         property "sonar.coverage.jacoco.xmlReportPaths",
                 "build/reports/jacoco/test/jacocoTestReport.xml"
     }
