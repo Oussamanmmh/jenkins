@@ -20,26 +20,9 @@ pipeline {
             steps {
                 echo "Phase Test : Lancement des tests unitaires"
                 sh './gradlew clean test'
-
                 echo "Archivage des résultats JUnit"
                 junit allowEmptyResults: true, testResults: 'build/test-results/test/*.xml'
 
-                echo "Génération des rapports Cucumber"
-                script {
-                    try {
-                        sh './gradlew generateCucumberReports'
-                        publishHTML([
-                            allowMissing: true,
-                            alwaysLinkToLastBuild: true,
-                            keepAll: true,
-                            reportDir: 'build/reports/cucumber/html',
-                            reportFiles: 'overview-features.html',
-                            reportName: 'Cucumber Report'
-                        ])
-                    } catch (Exception e) {
-                        echo "⚠️ Cucumber non généré : ${e.message}"
-                    }
-                }
             }
         }
 
