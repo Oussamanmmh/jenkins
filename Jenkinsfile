@@ -181,7 +181,7 @@ pipeline {
                        --data '{
                            "text": "*Pipeline instable*\\n*Projet:* ${env.JOB_NAME}\\n*Build:* #${env.BUILD_NUMBER}\\n*URL:* ${env.BUILD_URL}",
                            "username": "Jenkins",
-                           "icon_emoji": ":warning:"
+                           "icon_emoji": ":warning: "
                        }' "$SLACK_WEBHOOK_URL"
                    """
                }
