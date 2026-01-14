@@ -29,10 +29,8 @@ pipeline {
    stage('Generate HTML report') {
                steps {
                    cucumber(
-                       buildStatus: 'UNSTABLE',
-                       reportTitle: 'My report',
-                       fileIncludePattern: 'build/reports/cucumber/*.json',
-                       trendsLimit: 10
+
+                       fileIncludePattern: 'build/reports/cucumber/json-report.json'
                    )
                }
            }
